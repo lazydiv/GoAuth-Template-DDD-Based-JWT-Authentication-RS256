@@ -14,9 +14,9 @@ var (
 	PublicKey  *rsa.PublicKey
 )
 
-func loadKyes() error {
+func LoadKeys() error {
 
-	privateKeyData, err := os.ReadFile("config/private.pem")
+	privateKeyData, err := os.ReadFile("config/keys/private.pem")
 	if err != nil {
 		return fmt.Errorf("failed to read private key file: %w", err)
 	}
@@ -26,7 +26,7 @@ func loadKyes() error {
 		return fmt.Errorf("failed to parse private key: %w", err)
 	}
 
-	publicKeyData, err := os.ReadFile("config/public.pem")
+	publicKeyData, err := os.ReadFile("config/keys/public.pem")
 	if err != nil {
 		return fmt.Errorf("failed to read public key file: %w", err)
 	}
