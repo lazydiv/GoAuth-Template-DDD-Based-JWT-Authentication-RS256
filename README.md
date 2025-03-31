@@ -52,14 +52,39 @@ This repository provides a Go-based authentication template using Gin & JWT (RS2
 
 ## Project Structure
 ```
-.
-├── app                  # Application layer
-├── domain               # Domain layer
-├── infrastructure       # Infrastructure layer
-├── interfaces           # Interfaces layer
-├── main.go              # Entry point
-└── keys                 # RSA keys for JWT
+GoAuth-Template-DDD-Based-JWT-Authentication-RS256/
+├── cmd/                  # Application entry point
+│   ├── main.go
+│   └── main_test.go
+├── config/               # Configuration files
+│   ├── config.yaml
+│   ├── config.go
+│   └── keys/             # RSA KYES              
+├── internal/             # Core business logic
+│   ├── entity/           # Domain entities
+│   │   ├── user.go
+│   │   └── ...
+│   ├── repository/       # Data access interfaces
+│   │   ├── user_repository.go
+│   │   └── ...
+│   ├── usecase/          # Application business rules
+│   │   ├── auth_usecase.go
+│   │   └── ...
+│   └── other_packages/
+├── pkg/                  # Shared libraries/utilities
+│   ├── security/         # Security utilities (JWT, hashing)
+│   │   ├── jwt.go
+│   │   ├── hash.go
+│   │   └── ...
+│   └── other_packages/
+├── .env                  # Environment variables
+├── .gitignore            # Git ignore file
+├── go.mod                # Go module dependencies
+├── go.sum                # Checksums for dependencies
+└── README.md             # Project documentation
+
 ```
+
 
 ## Configuration
 Configuration settings can be found in the `config` directory. Modify the `config.yaml` file to suit your environment.
