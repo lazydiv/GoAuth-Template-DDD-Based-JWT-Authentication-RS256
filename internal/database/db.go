@@ -34,6 +34,7 @@ func CreateUsersTableMigration(db *sql.DB) {
       id SERIAL PRIMARY KEY,
       email TEXT NOT NULL,
       password TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'user',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
  );`
 

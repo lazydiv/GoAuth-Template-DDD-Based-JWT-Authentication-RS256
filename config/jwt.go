@@ -5,24 +5,22 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 var (
-	// JWTSecret is the secret key used to sign the JWT
 	PrivateKey *rsa.PrivateKey
 	PublicKey  *rsa.PublicKey
 )
 
 func LoadKeys() error {
-
 	privateKeyData, err := os.ReadFile("config/keys/private.pem")
 	if err != nil {
 		return fmt.Errorf("failed to read private key file: %w", err)
 	}
 
-	PrivateKey, err = jwt.ParseRSAPrivateKeyFromPEM(privateKeyData)
-	if err != nil {
+	// ✅ Proper assignment to global variable
+	if PrivateKey, err = jwt.ParseRSAPrivateKeyFromPEM(privateKeyData); err != nil {
 		return fmt.Errorf("failed to parse private key: %w", err)
 	}
 
@@ -31,10 +29,10 @@ func LoadKeys() error {
 		return fmt.Errorf("failed to read public key file: %w", err)
 	}
 
-	PublicKey, err = jwt.ParseRSAPublicKeyFromPEM(publicKeyData)
-
-	if err != nil {
+	// ✅ Proper assignment to global variable
+	if PublicKey, err = jwt.ParseRSAPublicKeyFromPEM(publicKeyData); err != nil {
 		return fmt.Errorf("failed to parse public key: %w", err)
 	}
+
 	return nil
 }

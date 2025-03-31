@@ -86,8 +86,9 @@ func VerifyToken(tokenString string) (*TokenClaims, error) {
 		}
 		return publicKey, nil
 	})
+
+	// Handle parsing errors
 	if err != nil {
-		// Handle JWT validation errors
 		if errors.Is(err, jwt.ErrTokenExpired) {
 			return nil, fmt.Errorf("token expired")
 		} else if errors.Is(err, jwt.ErrTokenNotValidYet) {
@@ -97,36 +98,47 @@ func VerifyToken(tokenString string) (*TokenClaims, error) {
 		}
 		return nil, fmt.Errorf("token validation failed: %w", err)
 	}
-	// Extract the claims
+
+	// Ensure token is valid
+	if !token.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
+
+	// Extract claims correctly
 	claims, ok := token.Claims.(*TokenClaims)
 	if !ok {
 		return nil, fmt.Errorf("invalid token claims format")
 	}
 
-	// Additional validation if needed (e.g., check specific claims)
-	// For example, you might want to validate the issuer or audience
-	// if claims.Issuer != "auth-template" {
-	//     return nil, fmt.Errorf("invalid token issuer")
-	// }
-
 	return claims, nil
 }
-
-func RefreshToken(tokenString, role string) (string, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (any, error) {
+func RefreshToken(tokenString string) (string, error) {
+	// Parse the refresh token and extract claims
+	token, err := jwt.ParseWithClaims(tokenString, &TokenClaims{}, func(token *jwt.Token) (any, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
 		return publicKey, nil
 	})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to parse refresh token: %w", err)
 	}
 
-	claims := token.Claims.(*TokenClaims)
-	userId := claims.UserID
-	email := claims.Email
+	// Ensure the token is valid
+	if !token.Valid {
+		return "", fmt.Errorf("invalid refresh token")
+	}
 
-	newAccessToken, _, err := GenerateJWT(userId, email, role) // Role should come from DB
+	// Extract claims properly
+	claims, ok := token.Claims.(*TokenClaims)
+	if !ok {
+		return "", fmt.Errorf("invalid refresh token claims format")
+	}
+
+	// Generate a new access token using the user data from the refresh token
+	newAccessToken, _, err := GenerateJWT(claims.UserID, claims.Email, claims.Role)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to generate new access token: %w", err)
 	}
 
 	return newAccessToken, nil
